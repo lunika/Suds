@@ -5,6 +5,29 @@
 * Source: http://github.com/kwhinnery/Suds
 */
 function SudsClient(_options) {
+    function isBrowserEnvironment() {
+    try {
+      if (window && window.navigator) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch(e) {
+      return false;
+    }
+  }
+
+  function isAppceleratorTitanium() {
+    try {
+      if (Titanium) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch(e) {
+      return false;
+    }
+  }
   //A generic extend function - thanks MooTools
   function extend(original, extended) {
     extended = extended || {};
@@ -24,11 +47,16 @@ function SudsClient(_options) {
   //Grab an XMLHTTPRequest Object
   function getXHR() {
     var xhr;
-    if (window.XMLHttpRequest) {
-      xhr = new XMLHttpRequest();
+    if (isBrowserEnvironment()) {
+      if (window.XMLHttpRequest) {
+        xhr = new XMLHttpRequest();
+      }
+      else {
+        xhr = new ActiveXObject("Microsoft.XMLHTTP");
+      }
     }
-    else {
-      xhr = new ActiveXObject("Microsoft.XMLHTTP");
+    else if (isAppceleratorTitanium()) {
+      xhr = Titanium.Network.createHTTPClient();
     }
     return xhr;
   }
@@ -36,14 +64,19 @@ function SudsClient(_options) {
   //Parse a string and create an XML DOM object
   function xmlDomFromString(_xml) {
     var xmlDoc = null;
-    if (window.DOMParser) {
-      parser = new DOMParser();
-      xmlDoc = parser.parseFromString(_xml,"text/xml");
+    if (isBrowserEnvironment()) {
+      if (window.DOMParser) {
+        parser = new DOMParser();
+        xmlDoc = parser.parseFromString(_xml,"text/xml");
+      }
+      else {
+        xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
+        xmlDoc.async = "false";
+        xmlDoc.loadXML(_xml); 
+      }
     }
-    else {
-      xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
-      xmlDoc.async = "false";
-      xmlDoc.loadXML(_xml); 
+    else if (isAppceleratorTitanium()) {
+      xmlDoc = Titanium.XML.parseString(_xml);
     }
     return xmlDoc;
   }
