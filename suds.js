@@ -135,7 +135,8 @@ function SudsClient(_options) {
     	body : '',
     	success : function(){},
     	error : function(){},
-    	header : false
+    	header : false,
+    	RequestHeader : {}
     }
 
     opt = extend(opt, params);
@@ -188,10 +189,17 @@ function SudsClient(_options) {
     xhr.open('POST',config.endpoint);
     xhr.setRequestHeader('Content-Type', config.contentType);
     //xhr.setRequestHeader('Content-Length', sendXML.length);
+    for(var key in opt.RequestHeader)
+    {
+    	Ti.API.debug(key+" : "+opt.RequestHeader[key])
+    	xhr.setRequestHeader(key,opt.RequestHeader[key]);
+    }
     xhr.setRequestHeader('SOAPAction', soapAction);
     if (config.authorization !== undefined) {
 		xhr.setRequestHeader('Authorization', 'Basic ' + config.authorization);
 	}
+    
+    
     xhr.send(sendXML);
   };
 }
