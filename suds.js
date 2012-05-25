@@ -5,7 +5,7 @@
 * Source: http://github.com/kwhinnery/Suds
 */
 function SudsClient(_options) {
-    function isBrowserEnvironment() {
+  function isBrowserEnvironment() {
     try {
       if (window && window.navigator) {
         return true;
@@ -38,12 +38,12 @@ function SudsClient(_options) {
     }
     return original;
   }
-  
+
   //Check if an object is an array
   function isArray(obj) {
     return Object.prototype.toString.call(obj) == '[object Array]';
   }
-  
+
   //Grab an XMLHTTPRequest Object
   function getXHR() {
     var xhr;
@@ -60,7 +60,7 @@ function SudsClient(_options) {
     }
     return xhr;
   }
-  
+
   //Parse a string and create an XML DOM object
   function xmlDomFromString(_xml) {
     var xmlDoc = null;
@@ -72,7 +72,7 @@ function SudsClient(_options) {
       else {
         xmlDoc = new ActiveXObject("Microsoft.XMLDOM");
         xmlDoc.async = "false";
-        xmlDoc.loadXML(_xml); 
+        xmlDoc.loadXML(_xml);
       }
     }
     else if (isAppceleratorTitanium()) {
@@ -80,7 +80,7 @@ function SudsClient(_options) {
     }
     return xmlDoc;
   }
-  
+
   // Convert a JavaScript object to an XML string - takes either an
   function convertToXml(_obj) {
     var xml = '';
@@ -103,7 +103,7 @@ function SudsClient(_options) {
     }
     return xml;
   }
-  
+
   // Client Configuration
   var config = extend({
     endpoint:'http://localhost',
@@ -114,7 +114,7 @@ function SudsClient(_options) {
     headerEnd: '</soap:Header>',
     bodyBegin:'<soap:Body>',
     envelopeEnd: '</soap:Body></soap:Envelope>',
-    timeout: 5000, 
+    timeout: 5000,
     responseType: 'object',
     contentType : 'text/xml'
   },_options);
@@ -126,10 +126,10 @@ function SudsClient(_options) {
   //	success : function(){} callback function on success
   //	error : function(){} callback function onerror
   //	header
-  //}) { 
-  this.invoke = function(params) {    
-    //Build request body 
-    
+  //}) {
+  this.invoke = function(params) {
+    //Build request body
+
     var opt = {
     	soapAction : '',
     	body : '',
@@ -139,12 +139,12 @@ function SudsClient(_options) {
     }
 
     opt = extend(opt, params);
-    
+
     var body = opt.body;
     var header = opt.header;
-    
 
-    
+
+
     //Allow straight string input for XML body - if not, build from object
     if (typeof body !== 'string') {
       body = '<'+opt.soapAction+' xmlns="'+config.targetNamespace+'">';
@@ -154,7 +154,7 @@ function SudsClient(_options) {
 
     var ebegin = config.envelopeBegin;
     config.envelopeBegin = ebegin.replace('PLACEHOLDER', config.targetNamespace);
-    
+
     //Build Soapaction header - if no trailing slash in namespace, need to splice one in for soap action
     var soapAction = '';
     if (config.targetNamespace.lastIndexOf('/') != config.targetNamespace.length - 1) {
@@ -163,7 +163,7 @@ function SudsClient(_options) {
     else {
       soapAction = config.targetNamespace+opt.soapAction;
     }
-    
+
     //POST XML document to service endpoint
     var xhr = getXHR();
     xhr.onload = function() {
