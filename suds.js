@@ -115,20 +115,41 @@ function SudsClient(_options) {
     bodyBegin:'<soap:Body>',
     envelopeEnd: '</soap:Body></soap:Envelope>',
     timeout: 5000, 
-    responseType: 'object'
+    responseType: 'object',
+    contentType : 'text/xml'
   },_options);
 
   // Invoke a web service
-  this.invoke = function(_soapAction,_body,_callback,_error,_header) {    
+  //this.invoke = function({
+  //	soapAction : 'method of the webservice'
+  //	body : { }
+  //	success : function(){} callback function on success
+  //	error : function(){} callback function onerror
+  //	header
+  //}) { 
+  this.invoke = function(params) {    
     //Build request body 
-    var body = _body;
-    var header = _header;
+    
+    var opt = {
+    	soapAction : '',
+    	body : '',
+    	success : function(){},
+    	error : function(){},
+    	header : false
+    }
+
+    opt = extend(opt, params);
+    
+    var body = opt.body;
+    var header = opt.header;
+    
+
     
     //Allow straight string input for XML body - if not, build from object
     if (typeof body !== 'string') {
-      body = '<'+_soapAction+' xmlns="'+config.targetNamespace+'">';
-      body += convertToXml(_body);
-      body += '</'+_soapAction+'>';
+      body = '<'+opt.soapAction+' xmlns="'+config.targetNamespace+'">';
+      body += convertToXml(opt.body);
+      body += '</'+opt.soapAction+'>';
     }
 
     var ebegin = config.envelopeBegin;
@@ -137,19 +158,19 @@ function SudsClient(_options) {
     //Build Soapaction header - if no trailing slash in namespace, need to splice one in for soap action
     var soapAction = '';
     if (config.targetNamespace.lastIndexOf('/') != config.targetNamespace.length - 1) {
-      soapAction = config.targetNamespace+'/'+_soapAction;
+      soapAction = config.targetNamespace+'/'+opt.soapAction;
     }
     else {
-      soapAction = config.targetNamespace+_soapAction;
+      soapAction = config.targetNamespace+opt.soapAction;
     }
     
     //POST XML document to service endpoint
     var xhr = getXHR();
     xhr.onload = function() {
-      _callback.call(this, config.responseType == 'object' ? xmlDomFromString(this.responseText) : this.responseText );
+      opt.success.call(this, config.responseType == 'object' ? xmlDomFromString(this.responseText) : this.responseText );
     };
-    xhr.onerror = function() {
-      _error.call();
+    xhr.onerror = function(error) {
+      opt.error.call(this,error);
     }
     xhr.setTimeout(config.timeout);
     var sendXML = '';
@@ -157,20 +178,20 @@ function SudsClient(_options) {
         sendXML = config.envelopeBegin+config.bodyBegin+body+config.envelopeEnd;
     } else {
         //Allow straight string input for XML body - if not, build from object
-        if (typeof header !== 'string') {
-          header = '<'+_soapAction+' xmlns="'+config.targetNamespace+'">';
-          header += convertToXml(_header);
-          header += '</'+_soapAction+'>';
+        if (typeof opt.header !== 'string') {
+          header = '<'+opt.soapAction+' xmlns="'+config.targetNamespace+'">';
+          header += convertToXml(opt.header);
+          header += '</'+opt.soapAction+'>';
         }
         sendXML = config.envelopeBegin+config.headerBegin+header+config.headerEnd+config.bodyBegin+body+config.envelopeEnd;
     }
     xhr.open('POST',config.endpoint);
-        xhr.setRequestHeader('Content-Type', 'text/xml');
-        xhr.setRequestHeader('Content-Length', sendXML.length);
-        xhr.setRequestHeader('SOAPAction', soapAction);
-        if (config.authorization !== undefined) {
-	  xhr.setRequestHeader('Authorization', 'Basic ' + config.authorization);
+    xhr.setRequestHeader('Content-Type', config.contentType);
+    //xhr.setRequestHeader('Content-Length', sendXML.length);
+    xhr.setRequestHeader('SOAPAction', soapAction);
+    if (config.authorization !== undefined) {
+		xhr.setRequestHeader('Authorization', 'Basic ' + config.authorization);
 	}
-        xhr.send(sendXML);
+    xhr.send(sendXML);
   };
 }
