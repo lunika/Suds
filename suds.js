@@ -123,9 +123,14 @@ function SudsClient(_options) {
   //this.invoke = function({
   //	soapAction : 'method of the webservice'
   //	body : { }
-  //	success : function(){} callback function on success
-  //	error : function(){} callback function onerror
-  //	header
+  //	success : function(){
+  // 		this refer to : http://docs.appcelerator.com/titanium/2.0/#!/api/Titanium.Network.HTTPClient 
+  //    } callback function on success
+  //	error : function(){
+  // 		this refer to : http://docs.appcelerator.com/titanium/2.0/#!/api/Titanium.Network.HTTPClient
+  //	} callback function onerror
+  //	header : '',
+  //	RequestHeader : {} add key/value to header request (eg {cookie : 'foo'})
   //}) {
   this.invoke = function(params) {
     //Build request body

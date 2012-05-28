@@ -20,8 +20,16 @@ dependent upon it and can be used independently.
 	  targetNamespace: "http://websevriceshare.com/" 
 	});
 	
-	suds.invoke("GetSupportedCurrencies", {}, function(xmlDoc) {
-	  //Parse XML response (SOAP Envelope)
+	suds.invoke({
+		soapAction : "GetSupportedCurrencies", 
+		body : {
+			param1 : "value1",
+			param2 : "value2"
+		},
+		success :  function(xmlDoc) {
+	  	//Parse XML response (SOAP Envelope)
+		},
+		error : function(){}
 	});
 		
 ## API
@@ -39,8 +47,9 @@ Constructor for a Suds SOAP web service client.
 	* envelopeBegin (optional) - a string containing the XML preceding the contents of the SOAP request body
 	* envelopeEnd (optional) - a string containing the XML following the contents of the SOAP request body
 	* authorization (optional) - a string used to specify basic HTTP authorization in the request header
+	* timeout (optional) - default : 5000 ms
 	
-### `sudsClient.invoke(soapAction, body, callback(xmlDoc))`
+### `sudsClient.invoke({soapAction : '', body : {}, success : function(xmlDoc){}, error : function(){}, header : '', RequestHeader : {} })`
 
 Invoke a SOAP action on the web service defined by this Suds instance.
 
@@ -48,9 +57,13 @@ Invoke a SOAP action on the web service defined by this Suds instance.
 * body - can be one of:
 	* An XML string containing the SOAP request body, constructed manually
 	* A JavaScript object containing a hierarchical data structure which can be converted to XML
-* callback - a callback function to process the request result, with the following information
+* success - a callback function to process the request on success, with the following information
 	* [this] - `this` inside your callback will refer to the XHR object used to make the SOAP web service call
 	* xmlDoc - An [XML Document Object](http://www.w3schools.com/Dom/default.asp) containing the SOAP response
+* error - a callback function to process the request on error, with the following information
+	* [this] - `this` inside your callback will refer to the XHR object used to make the SOAP web service call
+* header - additional information for soap header
+* RequestHeader - a Javascript object containing additional header for http request (eg : RequestHeader : { cookie : "foo" } )
 	
 ## Examples
 
