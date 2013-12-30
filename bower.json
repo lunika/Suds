@@ -1,0 +1,22 @@
+{
+  "name": "Suds",
+  "main": "suds.js",
+  "version": "0.1.0",
+  "homepage": "https://github.com/datilmedia/Suds",
+  "authors": [
+    "Kevin Whinnery"
+  ],
+  "description": "A lightweight SOAP client library for JavaScript",
+  "keywords": [
+    "soap",
+    "client"
+  ],
+  "license": "Apache",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}
